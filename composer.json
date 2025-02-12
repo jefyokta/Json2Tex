@@ -1,0 +1,17 @@
+{
+    "name": "jefyokta/json2tex",
+    "description": "tiptap or prosess mirror json converter to tex",
+    "license": "mit",
+    "autoload": {
+        "psr-4": {
+            "Jefyokta\\Json2tex\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Jepi Oktamipa",
+            "email": "jefyokta50@gmail.com"
+        }
+    ],
+    "require": {}
+}

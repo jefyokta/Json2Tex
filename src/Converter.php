@@ -16,7 +16,7 @@ class Converter {
         return "$" . ($content->attrs->content ?? '') . "$";
     }
 
-    function blockMath($content) :string{
+    function blockMath($content): string {
         return "\n\\[\n" . ($content->attrs->content ?? '') . "\n\\]\n";
     }
 
@@ -34,21 +34,62 @@ class Converter {
         return "\\item " . JsonToTex::getContent($content->content) . "\n";
     }
 
-
-    function figure($element){
-
-
+    function figure($element) {
         return "
-        \\begin{figure}\n
-        \\centering\n
-        \\includegraphics{{ $element->attrs->src }}
-        \\caption{}
-        \\end{figure}\n
+        \\begin{figure}[h]
+        \\centering
+        \\includegraphics{" . $element->attrs->src . "}
+        \\caption{" . ($element->attrs->caption ?? '') . "}
+        \\end{figure}
         ";
+    }
+
+    function text($element) {
+        if (!empty($element->marks)) {
+            foreach ($element->marks as $mark) {
+                if (method_exists($this, $mark->type)) {
+                    $element->text = call_user_func([$this, $mark->type], $element->text);
+                }
+            }
+        }
+        return $element->text;
+    }
+
+    function image($element){
+
+        return "\\inludegraphics{".$element->src."}";
 
     }
 
-    function text($element){
+    function cite($element) {
+        if ($element->attrs->citeA) {
+            return "\\citeA{" . ($element->attrs->cite ?? '') . "}";
+        }
+        return "\\cite{" . ($element->attrs->cite ?? '') . "}";
+    }
+
+    function var($element){
+        $var ="\\".$element->attrs->varname;;
+        if (!empty($element->marks)) {
+
+            foreach($element->marks as $mark){
+                if (method_exists($this, $mark->type)) {
+                    $var= call_user_func([$this, $mark->type], $var);
+                }
+            }
+        }
+
+        return $var;
 
     }
+
+    private function italic($text) {
+        return "\\textit{" . $text . "}";
+    }
+
+    private function bold($text) {
+        return "\\textbf{" . $text . "}";
+    }
+
+    
 }

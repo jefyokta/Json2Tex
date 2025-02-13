@@ -6,7 +6,6 @@ class JsonToTex {
 
     private array|object $json;
 
-    private string $result;
 
     public function __construct(string $json) {
 
@@ -19,18 +18,29 @@ class JsonToTex {
         return $this;
     }
 
+    /**
+     * @return string;
+     * 
+     */
+
     public function compile(){
 
      return   self::getContent($this->json->content);
 
     }
 
+    /**
+     * @param object[] $contents
+     * 
+     * @return string;
+     */
+
     public static function getContent($contents) {
         $result = '';
         $converter = new Converter();
         foreach ($contents as $content) {
             if (method_exists($converter, $content->type)) {
-                $result .= call_user_func([$converter, $content->type], $content);
+                $result .=  $converter->{$content->type}($content);
             }
         }
         return $result;

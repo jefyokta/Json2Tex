@@ -8,4 +8,4 @@ use Jefyokta\Json2Tex\JsonToTex;
 
 $jtex= new JsonToTex(json_encode(json_decode(file_get_contents('ex.json'))->json));
 
-echo $jtex->compile();
+file_put_contents('tes.tex',$jtex->compile());

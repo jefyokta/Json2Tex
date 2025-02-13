@@ -1,15 +1,34 @@
 <?php 
-
 namespace Jefyokta\Json2Tex;
+require_once __DIR__."/Headers.php";
 
 class Converter {
+
+    /**
+     * @param object{content:array} $content
+     * 
+     * @return string
+     */
 
     function paragraph($content) {
         return "\\par " . JsonToTex::getContent($content->content) . "\n";
     }
+    /**
+     * 
+     * Parsing object to latex headers
+     * @param object{content:array,attrs:object{level:int}} $content
+     * 
+     * @return string
+     */
 
-    function section($content) {
-        return "\\section{" . JsonToTex::getContent($content->content) . "}\n";
+
+    function heading($content) {
+
+        $synt = Headers::$level[$content->attrs->level] ?? false;
+        if (!$synt) {
+            return '';
+        }
+        return "\\$synt{" . JsonToTex::getContent($content->content) . "}\n";
     }
 
     function inlineMath($content): string {
@@ -34,6 +53,12 @@ class Converter {
         return "\\item " . JsonToTex::getContent($content->content) . "\n";
     }
 
+    /**
+     * @param object{attrs:object{src:string,caption:string}} $element
+     * 
+     * @return string
+     */
+
     function figure($element) {
         return "
         \\begin{figure}[h]
@@ -44,11 +69,17 @@ class Converter {
         ";
     }
 
+    /**
+     * @param object{text:string,marks?:null|object[]} $element
+     * 
+     * @return string
+     */
+
     function text($element) {
         if (!empty($element->marks)) {
             foreach ($element->marks as $mark) {
                 if (method_exists($this, $mark->type)) {
-                    $element->text = call_user_func([$this, $mark->type], $element->text);
+                 $element->text =   $this->{$mark->type}($element->text);
                 }
             }
         }
@@ -71,10 +102,9 @@ class Converter {
     function var($element){
         $var ="\\".$element->attrs->varname;;
         if (!empty($element->marks)) {
-
             foreach($element->marks as $mark){
                 if (method_exists($this, $mark->type)) {
-                    $var= call_user_func([$this, $mark->type], $var);
+                   $var = $this->{$mark->type}($var);
                 }
             }
         }

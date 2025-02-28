@@ -1,32 +1,23 @@
-<?php 
+<?php
+
 namespace Jefyokta\Json2Tex;
 
 
-class JsonToTex {
+class JsonToTex
+{
 
-    private array|object $json;
 
-
-    public function __construct(string $json) {
-
-        $this->json = json_decode($json);
-
-    }
-
-    public function save($file){
-        file_put_contents($file,$this->json);
-        return $this;
-    }
 
     /**
      * @return string;
      * 
      */
 
-    public function compile(){
+    public static function compile(string $json)
+    {
+        $json = json_decode($json);
 
-     return   self::getContent($this->json->content);
-
+        return   self::getContent($json->content);
     }
 
     /**
@@ -35,7 +26,8 @@ class JsonToTex {
      * @return string;
      */
 
-    public static function getContent($contents) {
+    public static function getContent($contents)
+    {
         $result = '';
         $converter = new Converter();
         foreach ($contents as $content) {
@@ -45,6 +37,4 @@ class JsonToTex {
         }
         return $result;
     }
-    
-
-}; 
+};

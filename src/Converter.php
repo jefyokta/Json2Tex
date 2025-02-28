@@ -31,24 +31,52 @@ class Converter {
         return "\\$synt{" . JsonToTex::getContent($content->content) . "}\n";
     }
 
+    /**
+     * @param object{content:array} $content
+     * 
+     * @return string
+     */
     function inlineMath($content): string {
         return "$" . ($content->attrs->content ?? '') . "$";
     }
 
+    /**
+     * @param object{content:array} $content
+     * 
+     * @return string
+     */
+
     function blockMath($content): string {
         return "\n\\[\n" . ($content->attrs->content ?? '') . "\n\\]\n";
     }
+
+    /**
+     * @param object{content:array} $content
+     * 
+     * @return string
+     */
 
     function orderedList($content) {
         $items = JsonToTex::getContent($content->content);
         return "\\begin{enumerate}\n" . $items . "\\end{enumerate}\n";
     }
 
+    /**
+     * @param object{content:array} $content
+     * 
+     * @return string
+     */
+
     function bulletList($content) {
         $items = JsonToTex::getContent($content->content);
         return "\\begin{itemize}\n" . $items . "\\end{itemize}\n";
     }
 
+    /**
+     * @param object{content:array} $content
+     * 
+     * @return string
+     */
     function listItem($content) {
         return "\\item " . JsonToTex::getContent($content->content) . "\n";
     }
@@ -88,7 +116,7 @@ class Converter {
 
     function image($element){
 
-        return "\\inludegraphics{".$element->src."}";
+        return "\\includegraphics{".$element->src."}";
 
     }
 
@@ -119,6 +147,11 @@ class Converter {
 
     private function bold($text) {
         return "\\textbf{" . $text . "}";
+    }
+
+    private function comment($text){
+        return $text;
+
     }
 
     

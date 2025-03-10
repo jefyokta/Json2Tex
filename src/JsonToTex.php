@@ -2,6 +2,7 @@
 
 namespace Jefyokta\Json2Tex;
 
+use Jefyokta\Json2Tex\Type\Node;
 
 class JsonToTex
 {
@@ -21,7 +22,7 @@ class JsonToTex
     }
 
     /**
-     * @param object[] $contents
+     * @param Node[] $contents
      * 
      * @return string;
      */
@@ -37,4 +38,10 @@ class JsonToTex
         }
         return $result;
     }
+
+    public function __call($name, $arguments)
+    {
+        $this->$name(...$arguments);
+    }
 };
+

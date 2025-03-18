@@ -2,6 +2,7 @@
 
 namespace Jefyokta\Json2Tex;
 
+use Jefyokta\Json2Tex\Interface\Converter as InterfaceConverter;
 use Jefyokta\Json2Tex\Type\Node,
     Jefyokta\Json2Tex\Type\Heading,
     Jefyokta\Json2Tex\Type\Table;
@@ -10,7 +11,7 @@ require_once __DIR__ . "/Headers.php";
 
 
 
-class Converter
+class Converter implements InterfaceConverter
 {
 
     /**
@@ -21,7 +22,7 @@ class Converter
 
     function paragraph($node)
     {
-        return "\\par " . JsonToTex::getContent($node->content) . "\n";
+        return "\\par " . JsonToTex::setContent($node->content) . "\n";
     }
     /**
      * 
@@ -39,7 +40,7 @@ class Converter
         if (!$synt) {
             return '';
         }
-        return "\\$synt{" . JsonToTex::getContent($content->content) . "}\n";
+        return "\\$synt{" . JsonToTex::setContent($content->content) . "}\n";
     }
 
     /**
@@ -71,7 +72,7 @@ class Converter
 
     function orderedList($content)
     {
-        $items = JsonToTex::getContent($content->content);
+        $items = JsonToTex::setContent($content->content)->getLatex();
         return "\\begin{enumerate}\n" . $items . "\\end{enumerate}\n";
     }
 
@@ -83,7 +84,7 @@ class Converter
 
     function bulletList($content)
     {
-        $items = JsonToTex::getContent($content->content);
+        $items = JsonToTex::setContent($content->content)->getLatex();
         return "\\begin{itemize}\n" . $items . "\\end{itemize}\n";
     }
 
@@ -94,7 +95,7 @@ class Converter
      */
     function listItem($content)
     {
-        return "\\item " . JsonToTex::getContent($content->content) . "\n";
+        return "\\item " . JsonToTex::setContent($content->content)->getLatex() . "\n";
     }
 
     /**
@@ -160,17 +161,17 @@ class Converter
         return $var;
     }
 
-    private function italic($text)
+   public function italic($text)
     {
         return "\\textit{" . $text . "}";
     }
 
-    private function bold($text)
+    public function bold($text)
     {
         return "\\textbf{" . $text . "}";
     }
 
-    private function comment($text)
+    public function comment($text)
     {
         return $text;
     }
@@ -230,7 +231,7 @@ class Converter
                     $rowspanTracker[$columnIndex]--;
                     $columnIndex++;
                 }
-                $text = JsonToTex::getContent($contents);
+                $text = JsonToTex::setContent($contents);
                 $colspan = $cell->attrs->colspan ?? 1;
                 $rowspan = $cell->attrs->rowspan ?? 1;
                 $align = $cell->attrs->align ?? 'l'; 
@@ -254,5 +255,21 @@ class Converter
 
         $latexTable .= "\\end{tabular}\n";
         return $latexTable;
+    }
+
+
+    public function tableCell($element)
+    {
+        
+    }
+
+    public function tableHeader()
+    {
+        
+    }
+
+    public function tableRow($element)
+    {
+        
     }
 }

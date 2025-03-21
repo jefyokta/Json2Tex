@@ -19,7 +19,7 @@ class JsonToTex
     private array $contents = [];
 
     /**
-     * Mengompilasi JSON ke dalam konten yang sesuai.
+     *  Immediately get latex content.
      *
      * @param string $json
      * @return string
@@ -31,7 +31,7 @@ class JsonToTex
     }
 
     /**
-     * Mengatur konten dari JSON.
+     * Set the tiptap json content
      *
      * @param Node[] $contents
      * @return static
@@ -43,8 +43,9 @@ class JsonToTex
     }
 
     /**
-     * Menghasilkan HTML dari konten.
+     * Return Html Output
      *
+     * Once the contents is null, it will use this->contents
      * @param Node[]|null $contents
      * @return string
      */
@@ -68,7 +69,7 @@ class JsonToTex
     }
 
     /**
-     * Mengubah konten menjadi string sesuai dengan konverter yang digunakan.
+     * Convert content using used concerter.
      *
      * @param Node[]|null $contents
      * @return string
@@ -88,7 +89,7 @@ class JsonToTex
     }
 
     /**
-     * Memungkinkan pemanggilan metode statis secara dinamis.
+     * calling method as static.
      *
      * @param string $name
      * @param array $arguments

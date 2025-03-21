@@ -15,7 +15,17 @@ class HtmlConverter implements Converter
     public function figure($element) {}
 
     public function heading($content) {}
-    public function listItem($content) {}
+    public function listItem($content)
+    {
+        $contents = $content->content;
+        $item = "";
+        foreach ($contents as $c) {
+            $item .= "<li>" . JsonToTex::setContent($c->content)->getHtml() . "</li>";
+        }
+        return "<ul>
+        $item
+        </ul>";
+    }
 
     public function orderedList($content) {}
     public function italic($text)
@@ -24,7 +34,8 @@ class HtmlConverter implements Converter
         return "<em>$text</em>";
     }
 
-    public function image($element) {
+    public function image($element)
+    {
 
         return "<img src=\"$element->attrs->src\">";
     }
@@ -54,9 +65,15 @@ class HtmlConverter implements Converter
 
     public function comment($text) {}
 
-    public function inlineMath($content) {}
+    public function inlineMath($content)
+    {
 
-    public function cite($element) {}
+        return "<span>" . Math::render($content->text) . "<span>";
+    }
+
+    public function cite($element) {
+        return "<cite>{$element->text}</cite>";
+    }
 
     public function blockMath($content) {}
 

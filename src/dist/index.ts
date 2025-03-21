@@ -1,5 +1,16 @@
 import katex from "katex";
+const latex= process.argv.slice(2);
+if (!latex) {
+    process.exit(1)
+}
 
-const result = katex.renderToString(process.argv[2])
+try {
+    const result = katex.renderToString(latex.join(" "), {
+        throwOnError: false, 
+    });
 
-console.log(result)
+    console.log(result);
+} catch (error) {
+    process.exit(1);
+}
+

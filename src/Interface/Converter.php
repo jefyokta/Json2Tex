@@ -1,7 +1,12 @@
 <?php
 
 namespace Jefyokta\Json2Tex\Interface;
+
 use Jefyokta\Json2Tex\Type\Node;
+use Jefyokta\Json2Tex\Type\Table;
+use Jefyokta\Json2Tex\Type\Heading;
+use Figure;
+
 interface Converter
 {
     /**
@@ -47,7 +52,7 @@ interface Converter
     public function listItem($content);
 
     /**
-     * @param object{attrs:object{src:string,caption:string}} $element
+     * @param Figure $element
      * @return string
      */
     public function figure($element);
@@ -102,13 +107,20 @@ interface Converter
 
 
     /**
-     * @param \Jefyokta\Json2Tex\Type\Node $element
+     * @param \Jefyokta\Json2Tex\Type\Cell $element
      */
     public function tableCell($element);
- /**
+    /**
      * @param \Jefyokta\Json2Tex\Type\Node $element
      */
     public function tableRow($element);
 
-    public function tableHeader();
+      /**
+     * @param \Jefyokta\Json2Tex\Type\Cell $element
+     */
+    public function tableHeader($element);
+
+
+
+   
 }

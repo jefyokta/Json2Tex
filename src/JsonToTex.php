@@ -2,7 +2,6 @@
 
 namespace Jefyokta\Json2Tex;
 
-use Jefyokta\Json2Tex\Converter as Json2TexConverter;
 use Jefyokta\Json2Tex\Interface\Converter;
 use Jefyokta\Json2Tex\Type\Node;
 
@@ -64,7 +63,7 @@ class JsonToTex
      */
     public function getLatex(?array $contents = null): string
     {
-        $this->converter = new Json2TexConverter();
+        $this->converter = new LatexConverter();
         return $this->getContent($contents ?? $this->contents);
     }
 
@@ -80,7 +79,7 @@ class JsonToTex
         $result = '';
 
         foreach ($contents as $content) {
-            if (method_exists($this->converter, $content->type)) {
+            if (method_exists($this->converter ?? LatexConverter::class, $content->type)) {
                 $result .= $this->converter->{$content->type}($content);
             }
         }
@@ -88,15 +87,4 @@ class JsonToTex
         return $result;
     }
 
-    /**
-     * calling method as static.
-     *
-     * @param string $name
-     * @param array $arguments
-     * @return mixed
-     */
-    public static function __callStatic($name, $arguments)
-    {
-        return (new static())->{$name}(...$arguments);
-    }
 }

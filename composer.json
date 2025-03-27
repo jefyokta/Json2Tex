@@ -4,7 +4,7 @@
     "license": "mit",
     "autoload": {
         "psr-4": {
-            "Jefyokta\\Json2tex\\": "src/"
+            "Jefyokta\\Json2Tex\\": "src/"
         }
     },
     "authors": [

@@ -1,7 +1,9 @@
 {
     "name": "jefyokta/json2tex",
-    "description": "tiptap or prosess mirror json converter to tex",
+    "description": "tiptap or prosess mirror json converter to html & tex",
     "license": "mit",
+    "keywords": ["tiptap", "json", "latex", "converter"],
+    "type":"library",
     "autoload": {
         "psr-4": {
             "Jefyokta\\Json2Tex\\": "src/"
@@ -13,5 +15,7 @@
             "email": "jefyokta50@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "php":">=7.2"
+    }
 }

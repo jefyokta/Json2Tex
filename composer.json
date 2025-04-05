@@ -6,7 +6,8 @@
     "type":"library",
     "autoload": {
         "psr-4": {
-            "Jefyokta\\Json2Tex\\": "src/"
+            "Jefyokta\\Json2Tex\\": "src/",
+            "Tests\\":"tests/"
         }
     },
     "authors": [
@@ -17,5 +18,13 @@
     ],
     "require": {
         "php":">=7.2"
+    },
+    "require-dev": {
+        "pestphp/pest": "^3.8"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
     }
 }

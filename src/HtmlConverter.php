@@ -99,30 +99,45 @@ class HtmlConverter implements Converter
 
     public function cite($element)
     {
-        return "<cite>{$element->text}</cite>";
+
+        $cites = Citation::getCollection();
+
+        $cite =   array_find($cites, function ($c) use ($element) {
+            return $c['cite'] == $element->attrs->cite;
+        });
+        $name = Citation::formatAuthorName($cite['author']);
+        $content = $element->citeA ? "{$name} ({$cite['year']})" : "({$name} ,{$cite['year']})";
+        return "<cite id=\"{$element->attrs->cite}\">{$content}</cite>";
     }
 
     public function blockMath($content) {}
 
     public function tableCell($element)
     {
-
         $rowSpan = $element->attrs->rowspan ?? 1;
         $colSpan = $element->attrs->colspan ?? 1;
         $width =  $element->attrs->colwidth[0];
         $content =  $element->content;
 
-        return "<td colspan=\"$colSpan\" rowspan=\"$rowSpan\" style=\"width:{$width}px\">{$this->getHtmlContent($content)}<td>";
+        return "<td colspan=\"$colSpan\" rowspan=\"$rowSpan\" style=\"width:{$width}px\">  
+         <div style=\"display:flex;flex-direction:column;justify-content:center;align-items:{$this->getCellalignment($element->attrs->align)}\">
+        {$this->getHtmlContent($content)}
+        </div><td>";
     }
 
-    public function tableHeader($element) {
+    public function tableHeader($element)
+    {
 
         $rowSpan = $element->attrs->rowspan;
         $colSpan = $element->attrs->colspan ?? 1;
         $width =  $element->attrs->colwidth[0];
         $content =  $element->content;
 
-        return "<th colspan=\"$colSpan\" rowspan=\"$rowSpan\" style=\"width:{$width}px\">{$this->getHtmlContent($content)}<th>";
+        return "<th colspan=\"$colSpan\" rowspan=\"$rowSpan\" style=\"width:{$width}px\">
+        <div style=\"display:flex;flex-direction:column;justify-content:center;align-items:{$this->getCellalignment($element->attrs->align)}\">
+        {$this->getHtmlContent($content)}
+        </div>
+        <th>";
     }
 
     public function tableRow($element)
@@ -132,10 +147,29 @@ class HtmlConverter implements Converter
         return "<tr>" . $this->getHtmlContent($element->content) . "</tr>";
     }
 
-    public function figureImage()
+    public function figureImage($element)
     {
 
         return "";
+    }
+
+    private function getCellAlignment(string $alignment): string
+    {
+        switch ($alignment) {
+            case 'left':
+                $align = "start";
+                break;
+            case 'center':
+                $align = "center";
+                break;
+
+            default:
+                $align = "start";
+
+                break;
+        }
+
+        return $align;
     }
 
 
@@ -144,5 +178,10 @@ class HtmlConverter implements Converter
     public function figureTable($element)
     {
         return "<figure id='{$element->attrs->figureId}'>{$this->getHtmlContent($element->content)}<figure>";
+    }
+
+    public function imageFigure($element)
+    {
+        return "<figure figureId=\"{$element->attrs->figureId}\" id=\"{$element->attrs->figureId}\">{$this->getHtmlContent($element->content)}</figure>";
     }
 }

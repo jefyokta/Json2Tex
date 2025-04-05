@@ -272,4 +272,9 @@ class LatexConverter implements InterfaceConverter
     {
         
     }
+
+    public function imageFigure($element)
+    {
+        return "";
+    }
 }

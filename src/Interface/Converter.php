@@ -70,7 +70,7 @@ interface Converter
     public function image($element);
 
     /**
-     * @param Node $element
+     * @param \Jefyokta\Json2Tex\Type\Cite $element
      * @return string
      */
     public function cite($element);
@@ -120,6 +120,10 @@ interface Converter
      */
     public function tableHeader($element);
 
+    /**
+     * @param Figure $element
+     */
+    public function imageFigure($element);
 
 
    

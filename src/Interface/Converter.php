@@ -129,4 +129,6 @@ interface Converter
    * @param Node $element
    */
   public function figcaption($element);
+
+  public function hasMethod(string $method):bool;
 }

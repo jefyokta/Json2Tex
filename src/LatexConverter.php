@@ -281,4 +281,9 @@ class LatexConverter implements InterfaceConverter
     {
         return "";
     }
+
+    public function hasMethod(string $method): bool
+    {
+        return method_exists($this,$method);
+    }
 }

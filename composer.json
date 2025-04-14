@@ -4,6 +4,9 @@
     "license": "mit",
     "keywords": ["tiptap", "json", "latex", "converter"],
     "type":"library",
+    "scripts":{
+        "test":["./vendor/bin/pest"]
+    },
     "autoload": {
         "psr-4": {
             "Jefyokta\\Json2Tex\\": "src/",

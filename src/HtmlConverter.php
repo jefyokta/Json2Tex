@@ -201,7 +201,7 @@ class HtmlConverter implements Converter
 
     public function __call($name, $arguments)
     {
-       return static::$custom[$name](...$arguments);
+        return static::$custom[$name](...$arguments);
     }
 
     /**
@@ -209,13 +209,18 @@ class HtmlConverter implements Converter
      * @param callable(\Jefyokta\Json2Tex\Type\Node): string $callback
      */
 
-    public static function register($name,$callback){
+    public static function register($name, $callback)
+    {
 
-        if (method_exists(new static(),$name)) {
+        if (method_exists(new static(), $name)) {
             throw new Error("method {$name} is already exists!");
         }
 
         static::$custom[$name] = $callback;
+    }
 
+    public function hasMethod(string $method): bool
+    {
+        return method_exists($this, $method) || isset(static::$custom[$method]);
     }
 }

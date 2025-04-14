@@ -1,6 +1,7 @@
 <?php
 
 use Jefyokta\Json2Tex\Citation;
+use Jefyokta\Json2Tex\HtmlConverter;
 
 require_once "vendor/autoload.php";
 Citation::set('dan','dkk.');

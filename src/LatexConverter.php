@@ -277,4 +277,8 @@ class LatexConverter implements InterfaceConverter
     {
         return "";
     }
+    public function figcaption($element)
+    {
+        return "";
+    }
 }

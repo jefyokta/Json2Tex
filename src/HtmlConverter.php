@@ -2,16 +2,24 @@
 
 namespace Jefyokta\Json2Tex;
 
+use Error;
 use Jefyokta\Json2Tex\Converter as Json2TexConverter;
 use Jefyokta\Json2Tex\Interface\Converter;
 use Jefyokta\Json2Tex\Type\Node;
 
 class HtmlConverter implements Converter
 {
+    /**
+     * @var array<string,callback>
+     */
+    private static $custom;
 
     /**
      * @param Node[] $nodes
      */
+
+
+
     private function getHtmlContent($nodes)
     {
 
@@ -150,7 +158,7 @@ class HtmlConverter implements Converter
     public function figureImage($element)
     {
 
-        return "";
+        return "<figure>{$this->getHtmlContent($element->content)}<figure>";
     }
 
     private function getCellAlignment(string $alignment): string
@@ -183,5 +191,31 @@ class HtmlConverter implements Converter
     public function imageFigure($element)
     {
         return "<figure figureId=\"{$element->attrs->figureId}\" id=\"{$element->attrs->figureId}\">{$this->getHtmlContent($element->content)}</figure>";
+    }
+
+
+    public function figcaption($element)
+    {
+        return "<figcaption>{$this->getHtmlContent($element->content)}</figcaption>";
+    }
+
+    public function __call($name, $arguments)
+    {
+       return static::$custom[$name](...$arguments);
+    }
+
+    /**
+     * @param string $name
+     * @param callable(\Jefyokta\Json2Tex\Type\Node): string $callback
+     */
+
+    public static function register($name,$callback){
+
+        if (method_exists(new static(),$name)) {
+            throw new Error("method {$name} is already exists!");
+        }
+
+        static::$custom[$name] = $callback;
+
     }
 }

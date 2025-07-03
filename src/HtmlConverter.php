@@ -190,7 +190,7 @@ class HtmlConverter implements Converter
 
     public function imageFigure($element)
     {
-        return "<figure figureId=\"{$element->attrs->figureId}\" id=\"{$element->attrs->figureId}\">{$this->getHtmlContent($element->content)}</figure>";
+        return "<figure figureId=\"{$element->attrs->figureId}\" id=\"{$element->attrs->figureId}\" style=\"width:100%;display:flex;flex-direction:column;align-items:center;\">{$this->getHtmlContent($element->content)}</figure>";
     }
 
 

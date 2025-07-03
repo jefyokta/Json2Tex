@@ -29,4 +29,8 @@ class Converter {
     public static function __callStatic($name, $arguments) {
         return self::getInstance()->{$name}(...$arguments);
     }
+
+    public static function generateHtmlTableOfContents(){
+        
+    }
 }

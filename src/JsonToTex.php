@@ -79,10 +79,10 @@ class JsonToTex
         $result = '';
         if (!$this->converter) {
             $this->converter = new LatexConverter;
-         
         }
 
         foreach ($contents as $content) {
+            $content = is_object($content) ? $content : (object) $content;
             if ($this->converter->hasMethod($content->type)) {
                 $result .= $this->converter->{$content->type}($content);
             }

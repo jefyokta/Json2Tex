@@ -2,6 +2,7 @@
 
 use Jefyokta\Json2Tex\Converter;
 use Jefyokta\Json2Tex\HtmlConverter;
+use Jefyokta\Json2Tex\HtmlTableOfContentConverter;
 
 require_once __DIR__ . "/../../vendor/autoload.php";
 
@@ -28,8 +29,17 @@ test('registering html convrter', function () {
         ]
     ]]);
     $result = Converter::setContent(json_decode($json))->getHtml();
-    echo $result;
-
 
     expect($result)->toBe('hello world');
+});
+
+test('html toc', function () {
+
+    $toc = new HtmlTableOfContentConverter();
+
+    $result =  $toc->render(json_decode(file_get_contents(__DIR__ . "/../../ex.json"))->contents);
+
+    echo $result;
+
+    expect(true)->toBe(true);
 });

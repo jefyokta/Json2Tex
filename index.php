@@ -1,18 +1,20 @@
 <?php
 
-use Jefyokta\Json2Tex\Citation;
-use Jefyokta\Json2Tex\HtmlConverter;
+use Jefyokta\Json2Tex\HtmlTableOfContentConverter;
+use Jefyokta\Json2Tex\JsonToTex;
 
-require_once "vendor/autoload.php";
-Citation::set('dan','dkk.');
-echo Citation::formatAuthorName('Doe, John and Smith, Jane and Tanaka, Hiroshi').PHP_EOL;
-echo Citation::formatAuthorName("Doe, John and Smith, Jane and Tanaka, Hiroshi and Lee, Anna and Kim, Min and Zhang, Wei");
+require_once __DIR__ . "/vendor/autoload.php";
 
 
-// $json = json_decode(file_get_contents("ex.json"));
-// $converter = Converter::setContent($json->contents);
+
+$raw = file_get_contents(__DIR__ . "/ex.json");
+$converter = new HtmlTableOfContentConverter();
+
+$nodes = json_decode($raw);
+$toc = $converter->render($nodes);
 
 
-// file_put_contents('result.html', $converter->getHtml());
-// // file_put_contents('result.tex', $converter->getLatex());
+$jt = new JsonToTex;
+$toc .= $jt->getHtml($nodes);
 
+file_put_contents('finalp.html', $toc);

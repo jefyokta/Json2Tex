@@ -1,67 +1,35 @@
 <?php
 
-class ClassA
+class A
 {
-    public function foo($arg1)
+    static $contract;
+    public function a($param)
     {
-        return "ClassA: foo dengan $arg1";
-    }
-
-    public function bar($arg1, $arg2)
-    {
-        return "ClassA: bar dengan $arg1 dan $arg2";
-    }
-}
-
-class ClassB
-{
-    public function foo($arg1, $arg2)
-    {
-        return "ClassB: foo dengan $arg1 dan $arg2";
-    }
-
-    public function bar($arg1)
-    {
-        return "ClassB: bar dengan $arg1";
-    }
-}
-/** 
- * @method string foo(string $arg1)
- * @method string foo(string $arg1, string $arg2)
- * @method string bar(string $arg1)
- * @method string bar(string $arg1, string $arg2)
- */
-class OverLoad
-{
-    private array $instances = [];
-
-    public function __construct()
-    {
-        $this->instances[] = new ClassA();
-        $this->instances[] = new ClassB();
-    }
-
-    public function __call($name, $arguments)
-    {
-        $argCount = count($arguments);
-
-        foreach ($this->instances as $instance) {
-            if (method_exists($instance, $name)) {
-                $method = new ReflectionMethod($instance, $name);
-                if ($method->getNumberOfParameters() === $argCount) {
-                    return $method->invoke($instance, ...$arguments);
-                }
-            }
+        if ($param instanceof static::$contract) {
+            echo 'ok';
+            return;
         }
-
-        throw new Exception("method '$name' dengan $argCount parameter.");
+        throw new Error("must be instance of " . static::$contract);
     }
+
+    static function setContract($contract)
+    {
+
+        self::$contract = $contract;
+    }
+};
+
+interface myInterface
+{
+    public function get();
+}
+class b implements myInterface
+{
+    public function get() {}
 }
 
+A::setContract(myInterface::class);
 
-$handler = new OverLoad();
 
-echo $handler->foo("Hello") . PHP_EOL;
-echo $handler->foo("A", "B") . PHP_EOL;
-echo $handler->bar("Test") . PHP_EOL;
-echo $handler->bar("X", "Y") . PHP_EOL;
+
+(new A)->a(new b);

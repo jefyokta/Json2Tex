@@ -1,8 +1,11 @@
 {
   "scripts": {
-    "build":"bun build src/dist/index.ts --outfile=src/dist/index.js --minify"
+    "build": "bun build src/dist/index.ts --outfile=src/dist/index.js --minify"
   },
-  "dependencies": { "katex": "^0.16.21" },
+  "dependencies": {
+    "katex": "^0.16.21",
+    "pagedjs": "^0.4.3"
+  },
   "devDependencies": {
     "@types/node": "^22.13.10"
   }

@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>TOC + Page Number</title>
+  <script src="https://unpkg.com/pagedjs/dist/paged.polyfill.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        @page {
+            size: A4;
+            margin: 3cm 3cm 4cm 3cm;
+
+            @bottom-center {
+                content: counter(page);
+                font-size: 10px;
+                color: #888;
+            }
+        }
+        @page st{
+
+        }
+
+        #page {
+            height: max-content;
+        }
+
+        .page h1 {
+            font-size: 14pt;
+            font-weight: 700;
+            text-align: center;
+            counter-reset: h2-counter fig-counter caption-counter;
+            counter-increment: h1-counter;
+            margin-bottom: 10pt;
+            margin-top: 10pt;
+            page-break-before: always;
+            break-before: page;
+
+        }
+        .page h1::before {
+            content: "BAB " counter(h1-counter) "\A";
+            font-weight: bold;
+            white-space: pre-line;
+        }
+
+        .page h2 {
+            font-size: 12pt;
+            font-weight: 600;
+            margin-bottom: 4pt;
+            display: list-item;
+            list-style: none;
+            counter-increment: h2-counter;
+            counter-reset: h3-counter;
+        }
+
+        .page table {
+            max-width: 14cm !important;
+            border-bottom: 1px solid black;
+            border-collapse: collapse;
+
+        }
+
+        .page table td,
+        table th {
+            position: relative;
+        }
+
+        td[colspan] {
+            border-right: none;
+        }
+
+        .selectedCell::after {
+            background: rgba(0, 0, 0, 0.07);
+            content: "";
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            pointer-events: none;
+            position: absolute;
+            z-index: 2;
+            width: 100%;
+        }
+
+        .page figure[data-type="figureTable"]>figcaption {
+            width: 14cm !important;
+            text-align: center;
+            counter-increment: caption-counter;
+        }
+
+        .page figure[data-type="figureTable"]>figcaption::before {
+            content: "Tabel " counter(h1-counter) "." counter(caption-counter) " ";
+        }
+
+
+
+        .page figure[data-type="imageFigure"] {
+            text-align: center;
+            align-items: center;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page th,
+        .page td {
+            text-align: left;
+            min-width: 100%;
+        }
+
+        .page td>div {
+            width: 100%;
+        }
+
+        .page th {
+            border-bottom: 1px solid black;
+            border-top: 1px solid black
+        }
+
+
+        .page h2::before {
+            content: counter(h1-counter) "." counter(h2-counter) " ";
+            font-weight: bold;
+        }
+
+        .page h3::before {
+            content: counter(h1-counter) "." counter(h2-counter) "." counter(h3-counter);
+            font-weight: bold;
+        }
+
+        .page h3 {
+            font-size: 12pt;
+            font-weight: 600;
+            margin-bottom: 3pt;
+            display: list-item;
+            list-style: none;
+            counter-increment: h3-counter;
+        }
+
+        .page figcaption {
+            counter-increment: fig-counter;
+        }
+
+        .page figcaption::before {
+            content: "Gambar " counter(h1-counter) "." counter(fig-counter) " ";
+        }
+
+        .page-break {
+            width: 21cm;
+            height: 6cm;
+            margin-left: -4cm;
+            position: relative;
+        }
+
+        .page > p {
+            text-indent: 1.27cm;
+            margin-top: 0;
+            margin-bottom: 0.5em;
+            text-align: justify;
+        }
+        .page , p > *{
+            max-width: 14cm !important;
+        }
+        .page p {
+            max-width: 14cm;
+            text-align: justify;
+            hyphens: auto;
+            hyphenate-limit-chars: 3 3 3;
+            overflow-wrap: break-word;
+        }
+
+        .page >.tiptap {
+            max-width: 14cm !important;
+        
+        }
+
+        .tiptap {
+            margin: 0;
+            padding: 0;
+        }
+
+        .page li p {
+            text-indent: 0;
+            text-align: justify;
+        }
+
+        .page ol {
+            list-style-position: outside;
+            list-style-type: decimal;
+            margin-left: 2.5em;
+        }
+
+
+        .page ul {
+            list-style-type: disc;
+            margin-left: 2.5em;
+        }
+
+        .page {
+            /* width: 210mm; */
+            /* padding: 3cm 3cm 4cm 4cm; */
+            /* margin: 0 auto; */
+            /* padding-right: 3px;
+            padding-left: 4px; */
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.5;
+            overflow-y: hidden;
+            box-sizing: border-box;
+            page-break-after: always;
+            font-size: 12pt;
+            position: relative;
+        }
+
+        .tiptap {
+            min-height: max-content;
+        }
+
+        .page-break {
+            height: 20px;
+            width: 100%;
+            border-top: 1px dashed #ccc;
+            margin: 10px 0;
+
+        }
+
+        .tiptap:focus {
+            outline: none;
+        }
+
+        .page cite {
+            font-style: normal;
+        }
+
+        .page h1 {
+            position: relative;
+        }
+
+        .page h1:hover::after {
+            opacity: 1;
+        }
+
+        .page h1::after {
+            content: "Editable, But won't affected";
+            white-space: nowrap;
+            background-color: rgba(1, 1, 1, 0.45);
+            border-radius: 5px;
+            color: white;
+            position: absolute;
+            text-align: center;
+            z-index: 555;
+            opacity: 0;
+            transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
+            pointer-events: none;
+            height: max-content;
+            font-size: 12px;
+            font-family: var(--font-mono, system-ui);
+            ;
+            right: 50%;
+            padding: 0 .4em;
+            top: -5px;
+        }
+    </style>
+<style>
+    /* .toc {
+      page: toc;
+    } */
+
+    /* @page toc {
+      margin: 2cm;
+    } */
+
+    .toc h1 {
+      text-align: center;
+      font-size: 1.5em;
+      margin-bottom: 1em;
+    }
+
+    .toc ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .toc li {
+      margin-bottom: 0.3em;
+      position: relative;
+    }
+/* 
+    .toc a {
+      text-decoration: none;
+      color: black;
+      position: relative;
+      width: 100%;
+      overflow: hidden;
+    } */
+
+    /* .toc a::after {
+      content:  target-counter(attr(href), page);
+      float: right;
+    } */
+
+
+    h2 {
+      counter-increment: section;
+    }
+
+    h2::before {
+      content: counter(section) ". ";
+    }
+    .toc li::before{
+        content: "...........................................................................................................................";
+        text-align: right;
+        color: #ccc;
+        letter-spacing: 2px;
+        width: 98%;
+        /* padding-left: 5px; */
+        font-size: .8em;
+        position: absolute;
+        overflow: hidden;
+        bottom: 0;
+    }
+    .toc li >span > a::after{
+      content:  target-counter(attr(href), page);
+
+    }
+    .toc li> a{
+        z-index: 100;
+        display: block;
+        height: 1em;
+        background-color: white;
+
+    }
+    .toc li{
+        display: flex;
+        justify-content: space-between;
+    }
+    *{
+        text-decoration: none;
+        color: black;
+    }
+    .toc{
+        string-set:page-footer counter(page,upper-roman)
+    }
+
+  </style>
+</head>
+
+<body>
+  <section class="toc">
+    <h1>Daftar Isi</h1>
+    <ul>
+      <li >
+        <a href="#pendahuluan" style="position: relative;width: max-content;"><span>Pendahuluan</span></a>
+        <span>
+            <a href="#pendahuluan"></a>
+        </span>
+    </li>
+
+
+
+      <li><a href="#latar-belakang" data-ref="latar-belakang">Latar Belakang</a></li>
+      <li><a href="#rumusan-masalah" data-ref="rumusan-masalah">Rumusan Masalah</a></li>
+      <li><a href="#tujuan" data-ref="tujuan">Tujuan</a></li>
+      <li><a href="#manfaat" data-ref="manfaat">Manfaat</a></li>
+      <li><a href="#ruang-lingkup" data-ref="ruang-lingkup">Ruang Lingkup</a></li>
+    </ul>
+  </section>
+    <div class="page" id="page">
+
+      
+<h1 id="pendahuluan">Pendahuluan</h1><h2 id="latar-belakang"><b>Latar Belakang</b></h2><p>LaTeX telah menjadi standar de facto dalam penulisan dokumen ilmiah, terutama di bidang akademik dan riset. Kemampuannya dalam menghasilkan dokumen dengan tipografi yang konsisten dan dukungan kuat terhadap formula matematika menjadikannya pilihan utama untuk penulisan karya ilmiah, skripsi, tesis, dan jurnal. Namun, proses penulisan LaTeX yang mengandalkan sintaksis berbasis teks membuatnya kurang ramah bagi pengguna awam. Banyak mahasiswa, khususnya yang tidak memiliki latar belakang dalam pemrograman atau markup language, mengalami kesulitan saat harus menulis dokumen ilmiah menggunakan LaTeX.</p><p>Seiring perkembangan teknologi antarmuka pengguna (UI/UX), pendekatan visual dalam pengolahan dokumen mulai banyak digunakan. Editor seperti Google Docs atau Microsoft Word telah membiasakan pengguna dengan sistem <em>what-you-see-is-what-you-get</em> (WYSIWYG), namun keduanya belum mampu memberikan kualitas output yang setara dengan LaTeX untuk dokumen ilmiah, khususnya dalam hal layout matematika dan pengaturan sitasi.</p><p>Untuk menjembatani kebutuhan akan kemudahan penggunaan dan kualitas output, dikembangkanlah HighTex, sebuah document editor berbasis web yang memungkinkan pengguna menulis dokumen ilmiah tanpa harus menulis kode LaTeX secara langsung. HighTex tidak mengonversi input pengguna ke format LaTeX secara real-time, namun dirancang sebagai <b>pengganti proses manual LaTeX</b> dengan pengalaman visual yang intuitif, terstruktur, dan sesuai standar akademik.</p><h2 id="rumusan-masalah"><b>Rumusan Masalah</b></h2><p>Berdasarkan latar belakang tersebut, rumusan masalah yang diangkat adalah:</p><ol><li><p>Bagaimana merancang sistem editor dokumen ilmiah yang mudah digunakan tanpa memerlukan pengetahuan LaTeX?</p></li><li><p>Bagaimana menyusun arsitektur sistem agar pengguna dapat membuat dokumen akademik terstruktur secara visual?</p></li><li><p>Bagaimana memastikan bahwa hasil akhir dokumen tetap sesuai dengan standar akademik walau tidak ditulis dalam LaTeX?</p></li></ol><h2 id="tujuan"><b>Tujuan</b></h2><p>Tujuan dari pengembangan HighTex adalah:</p><ul><li><p>Mengembangkan editor dokumen ilmiah berbasis web yang dapat menggantikan penulisan manual menggunakan LaTeX.</p></li><li><p>Memberikan pengalaman menulis dokumen yang mudah, cepat, dan tetap menjaga struktur akademik.</p></li><li><p>Menyediakan fitur visual seperti manajemen sitasi, penomoran otomatis, tabel, daftar isi, dan rumus matematika tanpa harus menulis kode LaTeX.</p></li></ul><h2 id="manfaat"><b>Manfaat</b></h2><p>Manfaat dari penelitian dan pengembangan ini antara lain:</p><ul><li><p>Membantu mahasiswa dan penulis akademik dalam menyusun dokumen tanpa harus mempelajari LaTeX.</p></li><li><p>Meningkatkan efisiensi dan akurasi dalam pembuatan dokumen ilmiah.</p></li><li><p>Menyediakan alternatif baru dalam penulisan akademik berbasis web.</p></li></ul><h2 id="ruang-lingkup"><b>Ruang Lingkup</b></h2><p>Ruang lingkup dari sistem HighTex ini mencakup:</p><ul><li><p>Penggunaan editor berbasis web dengan antarmuka WYSIWYG.</p></li><li><p>Dukungan terhadap struktur dokumen akademik: judul, bab, subbab, daftar pustaka, tabel, gambar, dan formula matematika.</p></li><li><p>Tidak mencakup integrasi langsung dengan compiler LaTeX seperti pdflatex, melainkan fokus pada pengalaman penulisan dan ekspor dokumen ke format akhir (PDF atau dokumen struktural lainnya).</p></li></ul>
+    </div>
+
+</body>
+</html>

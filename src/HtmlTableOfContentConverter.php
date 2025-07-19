@@ -3,73 +3,107 @@
 namespace Jefyokta\Json2Tex;
 
 use Jefyokta\Json2Tex\Type\Node;
+use Renderable;
 
-class HtmlTableOfContentConverter
+class HtmlTableOfContentConverter implements Renderable
 {
+    /**
+     * @var  string[]
+     */
+    private $slugs = [];
+
     /**
      * @param Node[] $nodes
      * @return string
      */
-    public function render(array $nodes): string
+
+
+    public function render(&$nodes): string
     {
-        $items = [];
-        foreach ($nodes as $node) {
-            // var_dump($node);
+        $tocItems = $this->extractHeadings($nodes);
+        return $this->renderHtml($tocItems);
+    }
+
+    /**
+     * @param Node[] $nodes
+     * @return array<int, array{level: int, text: string, id: string}>
+     */
+    private function extractHeadings(array &$nodes): array
+    {
+        $headings = [];
+
+        foreach ($nodes as &$node) {
             if ($node->type === 'heading') {
-                $level = (int) ($node->attrs->level ?? 1);
-                $text = $node->content[0]->text ?? '';
+                $level = $node->attrs->level ?? 1;
+                $text = $node->text ?? $this->extractText($node->content ?? []);
                 $id = $this->slugify($text);
-                $items[] = [
+                $node->attrs->id = $id;
+                $headings[] = [
                     'level' => $level,
-                    'text'  => $text,
-                    'id'    => $id,
+                    'text' => $text,
+                    'id' => $id,
                 ];
             }
+
+            if (!empty($node->content)) {
+                $headings = array_merge($headings, $this->extractHeadings($node->content));
+            }
         }
 
-        if (empty($items)) {
-            return '';
+        return $headings;
+    }
+
+    /**
+     * @param Node[] $nodes
+     */
+    private function extractText(array $nodes): string
+    {
+        $text = '';
+
+        foreach ($nodes as $node) {
+            $text .= $node->text ?? $this->extractText($node->content ?? []);
         }
 
-        $html = '<ul>';
-        $prevLevel = $items[0]['level'];
+        return trim($text);
+    }
+
+    /**
+     * @param array<int, array{level: int, text: string, id: string}> $items
+     */
+    private function renderHtml(array $items): string
+    {
+        $html = "<ul>\n";
+        $lastLevel = 0;
 
         foreach ($items as $item) {
-            $lvl = $item['level'];
-            if ($lvl > $prevLevel) {
-                $html .= str_repeat('<ul>', $lvl - $prevLevel);
-            }
-            elseif ($lvl < $prevLevel) {
-                $html .= str_repeat('</ul>', $prevLevel - $lvl);
-            }
-            // tambahkan item
-            $html .= sprintf(
-                '<li><a href="#%s">%s</a></li>',
-                htmlspecialchars($item['id'], ENT_QUOTES),
-                htmlspecialchars($item['text'])
-            );
+            $diff = $item['level'] - $lastLevel;
 
-            $prevLevel = $lvl;
+            if ($diff > 0) {
+                $html .= str_repeat("<ul>\n", $diff);
+            } elseif ($diff < 0) {
+                $html .= str_repeat("</ul>\n", -$diff);
+            }
+
+            $html .= "<li><a href=\"#{$item['id']}\" class=\"page-num\" data-ref=\"{$item['text']}\"></a></li>\n";
+            $lastLevel = $item['level'];
         }
 
-        // tutup sisa tag <ul>
-        if ($prevLevel > 1) {
-            $html .= str_repeat('</ul>', $prevLevel - 1);
-        }
-
-        $html .= '</ul>';
+        $html .= str_repeat("</ul>\n", $lastLevel - 1);
+        $html .= "</ul>\n";
 
         return $html;
     }
 
     /**
-     * Ubah teks menjadi slug (anchor-friendly)
+     * Convert string to slug for href anchors.
      */
-    protected function slugify(string $text): string
+    private function slugify(string $text): string
     {
-        // lowercase, hapus non-alphanumeric, ganti spasi dengan dash
-        $slug = preg_replace('/[^\p{L}\p{N}\s]/u', '', mb_strtolower($text));
-        $slug = preg_replace('/\s+/', '-', trim($slug));
+        $slug = strtolower(trim(preg_replace('/[^a-z0-9]+/i', '-', $text), '-'));
+        if (in_array($slug, $this->slugs)) {
+            $slug = $slug . date('u');
+        }
+        $this->slugs[] = $slug;
         return $slug;
     }
 }

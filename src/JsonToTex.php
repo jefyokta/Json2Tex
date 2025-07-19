@@ -90,4 +90,9 @@ class JsonToTex
 
         return $result;
     }
+
+    public function createHtmlToc(&$nodes =null){
+        $toc = new HtmlTableOfContentConverter;
+        return $toc->render($nodes ?? $this->contents);
+    }
 }

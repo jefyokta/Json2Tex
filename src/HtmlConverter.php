@@ -22,7 +22,9 @@ class HtmlConverter implements Converter
 
     private function getHtmlContent($nodes)
     {
-
+        if (!$nodes) {
+            return '';
+        }
         return  Json2TexConverter::getHtml($nodes);
     }
     public function paragraph($node)
@@ -45,7 +47,7 @@ class HtmlConverter implements Converter
 
     public function heading($content)
     {
-        return "<h{$content->attrs->level}>{$this->getHtmlContent($content->content)}</h{$content->attrs->level}>";
+        return "<h{$content->attrs->level} id=\"{$content->attrs->id}\">{$this->getHtmlContent($content->content ?? '')}</h{$content->attrs->level}>";
     }
     public function listItem($content)
     {
@@ -117,17 +119,26 @@ class HtmlConverter implements Converter
         $content = $element->citeA ? "{$name} ({$cite['year']})" : "({$name} ,{$cite['year']})";
         return "<cite id=\"{$element->attrs->cite}\">{$content}</cite>";
     }
+    public function blockMath($content)
+    {
 
-    public function blockMath($content) {}
+        return "<div style='display:flex;justify-content:center'><div>" .  Math::render($content->attrs?->latex ?? '') . "<div></div>";
+    }
+    public function mathBlock($content)
+    {
+
+        return "<div style='display:flex;justify-content:center'><div>" .  Math::render($content->attrs?->latex ?? '') . "<div></div>";
+    }
 
     public function tableCell($element)
     {
         $rowSpan = $element->attrs->rowspan ?? 1;
         $colSpan = $element->attrs->colspan ?? 1;
-        $width =  $element->attrs->colwidth[0];
+        $width =  $element->attrs->colwidth[0] ?? false;
+        $width = $width ? $width . "px" : "auto";
         $content =  $element->content;
 
-        return "<td colspan=\"$colSpan\" rowspan=\"$rowSpan\" style=\"width:{$width}px\">  
+        return "<td colspan=\"$colSpan\" rowspan=\"$rowSpan\" style=\"width:{$width}\">  
          <div style=\"display:flex;flex-direction:column;justify-content:center;align-items:{$this->getCellalignment($element->attrs->align)}\">
         {$this->getHtmlContent($content)}
         </div><td>";
@@ -139,9 +150,11 @@ class HtmlConverter implements Converter
         $rowSpan = $element->attrs->rowspan;
         $colSpan = $element->attrs->colspan ?? 1;
         $width =  $element->attrs->colwidth[0];
+        $width = $width ? $width . "px" : "auto";
+
         $content =  $element->content;
 
-        return "<th colspan=\"$colSpan\" rowspan=\"$rowSpan\" style=\"width:{$width}px\">
+        return "<th colspan=\"$colSpan\" rowspan=\"$rowSpan\" style=\"width:{$width}\">
         <div style=\"display:flex;flex-direction:column;justify-content:center;align-items:{$this->getCellalignment($element->attrs->align)}\">
         {$this->getHtmlContent($content)}
         </div>
@@ -154,7 +167,7 @@ class HtmlConverter implements Converter
 
         return "<tr>" . $this->getHtmlContent($element->content) . "</tr>";
     }
-
+ 
     public function figureImage($element)
     {
 

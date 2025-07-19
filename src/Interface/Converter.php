@@ -21,7 +21,7 @@ interface Converter
    */
   public function heading($content);
 
-  /**
+  /**e
    * @param Node $content
    * @return string
    */
@@ -31,7 +31,7 @@ interface Converter
    * @param Node $content
    * @return string
    */
-  public function blockMath($content);
+  public function mathBlock($content);
 
   /**
    * @param Node $content

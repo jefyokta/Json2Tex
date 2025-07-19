@@ -59,7 +59,7 @@ class LatexConverter implements InterfaceConverter
      * @return string
      */
 
-    function blockMath($content): string
+    function mathBlock($content): string
     {
         return "\n\\[\n" . ($content->attrs->content ?? '') . "\n\\]\n";
     }

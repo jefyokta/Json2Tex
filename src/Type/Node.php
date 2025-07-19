@@ -3,6 +3,10 @@
 namespace Jefyokta\Json2Tex\Type;
 
 
+/**
+ * @template T
+ */
+
 interface Node
 {
     /**
@@ -14,6 +18,7 @@ interface Node
      */
     public array $marks;
     public string $type;
+    /** @var T */
     public $attrs;
     public string $text;
 };

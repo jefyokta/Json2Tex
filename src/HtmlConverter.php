@@ -6,6 +6,7 @@ use Error;
 use Jefyokta\Json2Tex\Converter as Json2TexConverter;
 use Jefyokta\Json2Tex\Interface\Converter;
 use Jefyokta\Json2Tex\Type\Node;
+use Jefyokta\Json2Tex\Util\Table;
 
 class HtmlConverter implements Converter
 {
@@ -35,8 +36,7 @@ class HtmlConverter implements Converter
 
     public function table($element)
     {
-
-        return "<table>" . $this->getHtmlContent($element->content) . "</table>";
+        return (new Table)->render($element);
     }
 
     public function figure($element)
@@ -167,7 +167,7 @@ class HtmlConverter implements Converter
 
         return "<tr>" . $this->getHtmlContent($element->content) . "</tr>";
     }
- 
+
     public function figureImage($element)
     {
 
@@ -230,6 +230,16 @@ class HtmlConverter implements Converter
         }
 
         static::$custom[$name] = $callback;
+    }
+    /**
+     * 
+     * @param Node<object{id:string}> $node
+     * 
+     */
+
+    function ref($node) {
+
+        return "<a href=\"{$node->attrs->id}\"></a>";
     }
 
     public function hasMethod(string $method): bool

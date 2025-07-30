@@ -2,8 +2,8 @@
 
 namespace Jefyokta\Json2Tex;
 
+use Jefyokta\Json2Tex\Interface\Renderable;
 use Jefyokta\Json2Tex\Type\Node;
-use Renderable;
 
 class HtmlTableOfContentConverter implements Renderable
 {
@@ -72,7 +72,7 @@ class HtmlTableOfContentConverter implements Renderable
      */
     private function renderHtml(array $items): string
     {
-        $html = "<ul>\n";
+        $html = "";
         $lastLevel = 0;
 
         foreach ($items as $item) {

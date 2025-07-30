@@ -10,6 +10,11 @@ class Reference
     public function render($cites)
     {
 
+        $result = '';
+        foreach ($cites as $cite) {
+           $result .= "";
+        }
+
         return '';
     }
 }

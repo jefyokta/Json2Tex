@@ -2,8 +2,8 @@
 
 namespace Jefyokta\Json2Tex\List;
 
+use Jefyokta\Json2Tex\Interface\Renderable ;
 use Jefyokta\Json2Tex\Type\Node;
-use Renderable;
 
 class Table implements Renderable
 {

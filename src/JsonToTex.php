@@ -91,8 +91,14 @@ class JsonToTex
         return $result;
     }
 
-    public function createHtmlToc(&$nodes =null){
+    public function createHtmlToc(&$nodes = null)
+    {
         $toc = new HtmlTableOfContentConverter;
         return $toc->render($nodes ?? $this->contents);
+    }
+
+    function getKatexStyle()
+    {
+        return $style = __DIR__ . "/dist/dist/katex.min.css";
     }
 }

@@ -6,7 +6,9 @@ namespace Jefyokta\Json2Tex;
  * @method static string getHtml(?array $contents = null)
  * @method static string getLatex(?array $contents = null)
  * @method static string compile(string $json)
- * 
+ * @method static string createHtmlToc(&nodes)
+ *
+ * @method string createHtmlToc(&nodes)
  * @method JsonToTex setContent(array $contents)
  * @method string getHtml(?array $contents = null)
  * @method string getLatex(?array $contents = null)
@@ -30,7 +32,5 @@ class Converter {
         return self::getInstance()->{$name}(...$arguments);
     }
 
-    public static function generateHtmlTableOfContents(){
-        
-    }
+
 }

@@ -3,69 +3,88 @@
 namespace Jefyokta\Json2Tex\Util;
 
 use Jefyokta\Json2Tex\Converter;
-use Jefyokta\Json2Tex\JsonToTex;
+use Jefyokta\Json2Tex\Type\Table as TableType;
+use Jefyokta\Json2Tex\Type\TableRow;
 
 class Table
 {
-
     /**
-     * @param \Jefyokta\Json2Tex\Type\Table $table
+     * Render table as HTML.
+     *
+     * @param TableType $table
+     * @return string
      */
-    public function render($table)
+    public function render( $table): string
     {
         $rows = $table->content;
-        $cells = [];
-        $min = 1;
+        $colWidths = $this->calculateColWidths($rows);
+        $colGroupHtml = $this->renderColGroup($colWidths);
+        $tableBody = Converter::getHtml($rows);
+
+        return "<table>$colGroupHtml<tbody>$tableBody</tbody></table>";
+    }
+
+    /**
+     * Static wrapper to render table.
+     *
+     * @param TableType $table
+     * @return string
+     */
+    public static function html($table): string
+    {
+        return (new static())->render($table);
+    }
+
+    /**
+     * Calculate column widths from table rows.
+     *
+     * @param TableRow[] $rows
+     * @return array<int, int|string>
+     */
+    private function calculateColWidths(array $rows): array
+    {
+        $maxCols = 0;
+        $colWidths = [];
+
         foreach ($rows as $row) {
-            $cellsCount = count($row->content) ?? 0;
-            if ($cellsCount < $min) {
-                $min = $cellsCount;
-                $cells = $row->content;
+            foreach ($row->content as $i => $cell) {
+                if (!isset($colWidths[$i]) && isset($cell->attrs->colwidth[0])) {
+                    $colWidths[$i] = $cell->attrs->colwidth[0];
+                }
             }
+            $maxCols = max($maxCols, count($row->content));
         }
 
-        $colWidth =  $this->extractColWidth($cells);
-        $renderedWidth = $this->renderColWidth($colWidth);
+        for ($i = 0; $i < $maxCols; $i++) {
+            $colWidths[$i] = $colWidths[$i] ?? 'auto';
+        }
 
-        $tableContent = Converter::getHtml($rows);
-        return "<table>$renderedWidth<tbody>$tableContent</tbody></table>";
+        return $colWidths;
     }
+
     /**
-     * @param \Jefyokta\Json2Tex\Type\TableCell[] $cells
-     * 
-     * @return array<int|string>
+     * Render the <colgroup> tag with widths.
+     *
+     * @param array<int, int|string> $colWidths
+     * @return string
      */
-
-    private function extractColWidth($cells)
+    private function renderColGroup(array $colWidths): string
     {
-        $width = [];
-        foreach ($cells as $cell) {
-            $width[] = $cell->attrs->colwidth[0] ?? 'auto';
+        $html = '<colgroup>';
+        foreach ($colWidths as $width) {
+            $html .= '<col style="width:' . $this->convertWidth($width) . '">';
         }
-
-        return $width;
+        return $html . '</colgroup>';
     }
 
-    static function html($table)
-    {
-
-        return (new static)->render($table);
-    }
     /**
-     * 
-     * @param int[] $colWidth
+     * Convert column width to CSS string.
+     *
+     * @param int|string $width
+     * @return string
      */
-    private function renderColWidth($colWidth)
+    private function convertWidth(int|string $width): string
     {
-        $res = '<colgroup>';
-        foreach ($colWidth as $width) {
-            $res .= "<col style=\"width:{$this->convertWidth($width)}\">";
-        }
-        return $res .= "</colgroup>";
-    }
-
-    private function convertWidth($width){
-
-        return is_string($width ?? false) ? 'auto': $width.'px';
+        return is_string($width) ? 'auto' : "{$width}px";
     }
 }

@@ -3,6 +3,8 @@
 namespace Jefyokta\Json2Tex;
 
 use Error;
+use Jefyokta\Json2Tex\Collector\ImageCollector;
+use Jefyokta\Json2Tex\Collector\TableCollector;
 use Jefyokta\Json2Tex\Converter as Json2TexConverter;
 use Jefyokta\Json2Tex\Interface\Converter;
 use Jefyokta\Json2Tex\Type\Node;
@@ -31,7 +33,7 @@ class HtmlConverter implements Converter
     public function paragraph($node)
     {
 
-        return "<p>" . (isset($node->content) ? $this->getHtmlContent($node->content) : "") . "</p>";
+        return "<p>" . (isset($node->content) ? $this->getHtmlContent($node->content) : "&nbsp;") . "</p>";
     }
 
     public function table($element)
@@ -138,10 +140,7 @@ class HtmlConverter implements Converter
         $width = $width ? $width . "px" : "auto";
         $content =  $element->content;
 
-        return "<td colspan=\"$colSpan\" rowspan=\"$rowSpan\" style=\"width:{$width}\">  
-         <div style=\"display:flex;flex-direction:column;justify-content:center;align-items:{$this->getCellalignment($element->attrs->align)}\">
-        {$this->getHtmlContent($content)}
-        </div><td>";
+        return "<td colspan=\"$colSpan\" rowspan=\"$rowSpan\" style=\"width:{$width}\"><div style=\"display:flex;flex-direction:column;justify-content:center;align-items:{$this->getCellalignment($element->attrs->align)}\">{$this->getHtmlContent($content)}</div></td>";
     }
 
     public function tableHeader($element)
@@ -149,22 +148,18 @@ class HtmlConverter implements Converter
 
         $rowSpan = $element->attrs->rowspan;
         $colSpan = $element->attrs->colspan ?? 1;
-        $width =  $element->attrs->colwidth[0];
+        $width =  $element->attrs->colwidth[0] ?? false;
         $width = $width ? $width . "px" : "auto";
 
         $content =  $element->content;
 
-        return "<th colspan=\"$colSpan\" rowspan=\"$rowSpan\" style=\"width:{$width}\">
-        <div style=\"display:flex;flex-direction:column;justify-content:center;align-items:{$this->getCellalignment($element->attrs->align)}\">
-        {$this->getHtmlContent($content)}
-        </div>
-        <th>";
+        return "<th colspan=\"$colSpan\" rowspan=\"$rowSpan\" style=\"width:{$width}\"><div style=\"display:flex;flex-direction:column;justify-content:center;align-items:{$this->getCellalignment($element->attrs->align)}\">{$this->getHtmlContent($content)}</div></th>";
     }
 
     public function tableRow($element)
     {
 
-
+        var_dump(count($element->content));
         return "<tr>" . $this->getHtmlContent($element->content) . "</tr>";
     }
 
@@ -198,7 +193,9 @@ class HtmlConverter implements Converter
 
     public function figureTable($element)
     {
-        return "<figure id='{$element->attrs->figureId}'>{$this->getHtmlContent($element->content)}<figure>";
+
+        // var_dump($element->attrs);
+        return "<figure id=\"{$element->attrs->id}\">{$this->getHtmlContent($element->content)}<figure>";
     }
 
     public function imageFigure($element)
@@ -209,7 +206,7 @@ class HtmlConverter implements Converter
 
     public function figcaption($element)
     {
-        return "<figcaption>{$this->getHtmlContent($element->content)}</figcaption>";
+        return "<figcaption style=\"text-align:center\">{$this->getHtmlContent($element->content)}</figcaption>";
     }
 
     public function __call($name, $arguments)
@@ -233,17 +230,29 @@ class HtmlConverter implements Converter
     }
     /**
      * 
-     * @param Node<object{id:string}> $node
+     * @param Node<object{link:string,ref:"imageFigure"|"figureTable"}> $node
      * 
      */
 
-    function ref($node) {
+    function ref($node)
+    {
 
-        return "<a href=\"{$node->attrs->id}\"></a>";
+        $collector = $node->attrs->ref == 'imageFigure' ? ImageCollector::class : TableCollector::class;
+
+        $observer =   JsonToTex::getObserverIntance($collector);
+        $textContent =   $observer->get($node->attrs->link);
+        // var_dump($table);
+
+        return "<a href=\"#{$node->attrs->link}\">{$textContent}</a>";
     }
 
     public function hasMethod(string $method): bool
     {
         return method_exists($this, $method) || isset(static::$custom[$method]);
+    }
+
+    function refComponent($node)
+    {
+        return $this->ref($node);
     }
 }

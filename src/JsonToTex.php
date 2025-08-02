@@ -2,7 +2,10 @@
 
 namespace Jefyokta\Json2Tex;
 
+use Error;
+use Jefyokta\Json2Tex\Collector\BaseCollector;
 use Jefyokta\Json2Tex\Interface\Converter;
+use Jefyokta\Json2Tex\Interface\Observer;
 use Jefyokta\Json2Tex\Type\Node;
 
 class JsonToTex
@@ -16,6 +19,10 @@ class JsonToTex
      * @var Node[]
      */
     private array $contents = [];
+    /**
+     * @var array<class-string<BaseCollector>,BaseCollector>
+     */
+    private static $observers = [];
 
     /**
      *  Immediately get latex content.
@@ -80,9 +87,15 @@ class JsonToTex
         if (!$this->converter) {
             $this->converter = new LatexConverter;
         }
+        foreach ($contents as $content) {
 
+            foreach (static::$observers as $observer) {
+                $observer->onNode($content);
+            }
+        }
         foreach ($contents as $content) {
             $content = is_object($content) ? $content : (object) $content;
+
             if ($this->converter->hasMethod($content->type)) {
                 $result .= $this->converter->{$content->type}($content);
             }
@@ -100,5 +113,20 @@ class JsonToTex
     function getKatexStyle()
     {
         return $style = __DIR__ . "/dist/dist/katex.min.css";
+    }
+    function observe(BaseCollector $observer)
+    {
+        static::$observers[(string)$observer] = $observer;
+
+        return $this;
+    }
+
+    static function getObserverIntance(string $classname)
+    {
+        if (! isset(static::$observers[$classname])) {
+
+            throw new Error("Current generator is not using observer `{$classname}` , please add it first");
+        }
+        return static::$observers[$classname];
     }
 }

@@ -5,12 +5,13 @@ namespace Jefyokta\Json2Tex\Type;
 
 /**
  * @template T
+ * @template TContent
  */
 
 interface Node
 {
     /**
-     * @var Node[] $content
+     * @var Node[] | TContent[] $content
      */
     public array $content;
     /**
@@ -20,5 +21,6 @@ interface Node
     public string $type;
     /** @var T */
     public $attrs;
+
     public string $text;
 };

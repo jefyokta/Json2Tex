@@ -3,6 +3,7 @@
 namespace Jefyokta\Json2Tex\Util;
 
 use Jefyokta\Json2Tex\Converter;
+use Jefyokta\Json2Tex\Type\Node;
 use Jefyokta\Json2Tex\Type\Table as TableType;
 use Jefyokta\Json2Tex\Type\TableRow;
 
@@ -14,7 +15,7 @@ class Table
      * @param TableType $table
      * @return string
      */
-    public function render( $table): string
+    public function render($table): string
     {
         $rows = $table->content;
         $colWidths = $this->calculateColWidths($rows);
@@ -87,4 +88,6 @@ class Table
     {
         return is_string($width) ? 'auto' : "{$width}px";
     }
+    
+ 
 }

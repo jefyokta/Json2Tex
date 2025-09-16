@@ -37,6 +37,8 @@ abstract class BaseCollector implements Collector, Observer, Stringable
 
     public function get(string $id): ?string
     {
+
+        // var_dump($this->collection);
         return $this->collection[$id] ?? null;
     }
 
@@ -45,7 +47,7 @@ abstract class BaseCollector implements Collector, Observer, Stringable
         return $this->collection;
     }
 
-    public function __toString(): string
+   final public function __toString(): string
     {
         return static::class;
     }

@@ -35,4 +35,10 @@ class Math
         }
         return false;
     }
+
+    static function getKatexStyle(){
+
+        return file_get_contents(__DIR__."/dist/dist/katex.min.css");
+
+    }
 }

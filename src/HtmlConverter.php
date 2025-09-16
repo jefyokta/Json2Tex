@@ -2,16 +2,21 @@
 
 namespace Jefyokta\Json2Tex;
 
-use Error;
+use Jefyokta\Json2Tex\Alternative\Link;
 use Jefyokta\Json2Tex\Collector\ImageCollector;
 use Jefyokta\Json2Tex\Collector\TableCollector;
 use Jefyokta\Json2Tex\Converter as Json2TexConverter;
 use Jefyokta\Json2Tex\Interface\Converter;
+use Jefyokta\Json2Tex\Interface\Customable;
 use Jefyokta\Json2Tex\Type\Node;
 use Jefyokta\Json2Tex\Util\Table;
 
-class HtmlConverter implements Converter
+use function Termwind\style;
+
+class HtmlConverter implements Converter, Customable
 {
+
+    private $headingNum = 0;
     /**
      * @var array<string,callback>
      */
@@ -21,7 +26,27 @@ class HtmlConverter implements Converter
      * @param Node[] $nodes
      */
 
+    /**
+     * @param string $name
+     * @param callable(\Jefyokta\Json2Tex\Type\Node): string $callback
+     */
 
+    public static function custom($name, $callback)
+    {
+
+        static::$custom[$name] = $callback;
+    }
+
+
+    /**
+     * @param string $name
+     * @return callable(\Jefyokta\Json2Tex\Type\Node): string 
+     */
+    public static function getCustom($name)
+
+    {
+        return static::$custom[$name];
+    }
 
     private function getHtmlContent($nodes)
     {
@@ -49,6 +74,7 @@ class HtmlConverter implements Converter
 
     public function heading($content)
     {
+
         return "<h{$content->attrs->level} id=\"{$content->attrs->id}\">{$this->getHtmlContent($content->content ?? '')}</h{$content->attrs->level}>";
     }
     public function listItem($content)
@@ -60,7 +86,12 @@ class HtmlConverter implements Converter
     public function orderedList($content)
     {
 
-        return "<ol>{$this->getHtmlContent($content->content)}</ol>";
+        $start = '';
+        if ($s = $content->attrs->start) {
+            $start = "start=\"$s\"";
+        }
+
+        return "<ol $start>{$this->getHtmlContent($content->content)}</ol>";
     }
     public function italic($text)
     {
@@ -71,7 +102,8 @@ class HtmlConverter implements Converter
     public function image($element)
     {
 
-        return "<img src=\"{$element->attrs->src}\" style=\"width:{$element->attrs->width}\">";
+        return "<img src=\"{$element->attrs->src}\" class=\"image-figure\" style=\"width:{$element->attrs->width}px;max-height:90vh;max-width:100%;height:auto;object-fit:contain;\">";
+        return "<div style=\"position:relative;display:inline-block;width:{$element->attrs->width}px;max-width:100%\"><img src=\"{$element->attrs->src}\" class=\"image-figure\" style=\"width:100%;height:auto;\"></div>";
     }
 
     public function var($element) {}
@@ -87,6 +119,7 @@ class HtmlConverter implements Converter
         $element->text = htmlspecialchars($element->text, ENT_QUOTES, 'UTF-8');
         if (!empty($element->marks)) {
             foreach ($element->marks as $mark) {
+
                 if (method_exists($this, $mark->type)) {
                     $element->text = $this->{$mark->type}($element->text);
                 }
@@ -158,8 +191,6 @@ class HtmlConverter implements Converter
 
     public function tableRow($element)
     {
-
-        var_dump(count($element->content));
         return "<tr>" . $this->getHtmlContent($element->content) . "</tr>";
     }
 
@@ -193,20 +224,27 @@ class HtmlConverter implements Converter
 
     public function figureTable($element)
     {
-
-        // var_dump($element->attrs);
-        return "<figure id=\"{$element->attrs->id}\">{$this->getHtmlContent($element->content)}<figure>";
+        return "<figure id=\"{$element->attrs->id}\" data-type=\"figureTable\">{$this->getHtmlContent($element->content)}</figure>";
     }
 
     public function imageFigure($element)
     {
-        return "<figure figureId=\"{$element->attrs->figureId}\" id=\"{$element->attrs->figureId}\" style=\"width:100%;display:flex;flex-direction:column;align-items:center;\">{$this->getHtmlContent($element->content)}</figure>";
+
+        // return $this->getHtmlContent($element->content);
+
+        $caption = $this->figcaption($element->content[1], "imageFigure", $element->attrs->id);
+
+        return "<figure figureId=\"{$element->attrs->figureId}\" data-type=\"imageFigure\"  style=\"width:100%;display:flex;flex-direction:column;align-items:center;\">" . $this->getHtmlContent([$element->content[0]]) .$caption ."</figure>";
     }
 
 
-    public function figcaption($element)
+    public function figcaption($element, $type = null, $id = null)
     {
-        return "<figcaption style=\"text-align:center\">{$this->getHtmlContent($element->content)}</figcaption>";
+
+        $type = !empty($type) ? "data-type=\"$type\"" : "";
+        $id = !empty($id) ? "id=\"$id\"" : "";
+        $c = $element->content ?? false ? $this->getHtmlContent($element->content) : "";
+        return "<figcaption style=\"text-align:center\" $type $id>{$c}</figcaption>";
     }
 
     public function __call($name, $arguments)
@@ -214,20 +252,7 @@ class HtmlConverter implements Converter
         return static::$custom[$name](...$arguments);
     }
 
-    /**
-     * @param string $name
-     * @param callable(\Jefyokta\Json2Tex\Type\Node): string $callback
-     */
 
-    public static function register($name, $callback)
-    {
-
-        if (method_exists(new static(), $name)) {
-            throw new Error("method {$name} is already exists!");
-        }
-
-        static::$custom[$name] = $callback;
-    }
     /**
      * 
      * @param Node<object{link:string,ref:"imageFigure"|"figureTable"}> $node
@@ -237,13 +262,14 @@ class HtmlConverter implements Converter
     function ref($node)
     {
 
+        // return Link::ref($node);
+
         $collector = $node->attrs->ref == 'imageFigure' ? ImageCollector::class : TableCollector::class;
 
-        $observer =   JsonToTex::getObserverIntance($collector);
+        $observer =   JsonToTex::getObserverInstance($collector);
         $textContent =   $observer->get($node->attrs->link);
-        // var_dump($table);
 
-        return "<a href=\"#{$node->attrs->link}\">{$textContent}</a>";
+        return "<a href=\"#{$node->attrs->link}\" class=\"".strtolower($node->attrs->ref)."\">Gambar 6.99</a>";
     }
 
     public function hasMethod(string $method): bool

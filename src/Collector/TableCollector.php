@@ -9,7 +9,7 @@ class TableCollector extends BaseCollector
     public function onNode($node)
     {
 
-        if (($node->attrs->level ?? null) === 1) {
+        if (($node->attrs->level ?? false) === 1) {
             $this->chapter++;
             $this->tableNo = 1;
         }

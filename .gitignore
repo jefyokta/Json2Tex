@@ -6,3 +6,4 @@ result.tex
 index.ts
 test/
 *.html
+composer.lock

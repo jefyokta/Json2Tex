@@ -4,6 +4,7 @@ namespace Jefyokta\Json2Tex;
 
 use Error;
 use Jefyokta\Json2Tex\Collector\BaseCollector;
+use Jefyokta\Json2Tex\Exception\UnregisteredObserver;
 use Jefyokta\Json2Tex\Interface\Converter;
 use Jefyokta\Json2Tex\Interface\Observer;
 use Jefyokta\Json2Tex\Type\Node;
@@ -14,6 +15,8 @@ class JsonToTex
      * @var Converter
      */
     private Converter $converter;
+
+    private static $chapterCounter = 0;
 
     /**
      * @var Node[]
@@ -88,8 +91,10 @@ class JsonToTex
             $this->converter = new LatexConverter;
         }
         foreach ($contents as $content) {
-
             foreach (static::$observers as $observer) {
+                // if ($content->type == 'heading' && $content->attrs->level == 1) {
+                //     static::$chapterCounter++;
+                // }
                 $observer->onNode($content);
             }
         }
@@ -121,11 +126,16 @@ class JsonToTex
         return $this;
     }
 
-    static function getObserverIntance(string $classname)
+    static function getChapterCounter(){
+
+        return self::$chapterCounter;
+    }
+
+    static function getObserverInstance(string $classname)
     {
         if (! isset(static::$observers[$classname])) {
 
-            throw new Error("Current generator is not using observer `{$classname}` , please add it first");
+            throw new UnregisteredObserver("Current generator is not using observer `{$classname}` , please add it first");
         }
         return static::$observers[$classname];
     }
